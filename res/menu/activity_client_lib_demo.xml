@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<!--
+  <item
+  android:id="@+id/menu_settings"
+  android:orderInCategory="100"
+  android:showAsAction="never"
+  android:title="@string/menu_settings"/>
+-->
+
+  <item android:id="@+id/fileMenu" android:title="@string/fileMenu">
+  <menu>
+    <item android:id="@+id/saveFile" android:title="@string/saveFile" />
+    <item android:id="@+id/loadFile" android:title="@string/loadFile" />
+    <item android:id="@+id/getMetaData" android:title="@string/getMetaData" />    
+    <item android:id="@+id/getShortList" android:title="@string/getShortList" />
+  </menu>
+  </item>
+  
+  <item android:id="@+id/NetworkIO" android:title="@string/NetworkIO">
+  <menu>
+    <item android:id="@+id/login" android:title="@string/login" />
+    <item android:id="@+id/doSecureGet" android:title="@string/doSecureGet" />
+    <item android:id="@+id/checkConnection" android:title="@string/checkConnection"/>
+  </menu>
+  </item>
+  
+  <item android:id="@+id/pickAccount" android:title="@string/pickAccount" />
+  <item android:id="@+id/exit" android:title="@string/exit" />
+  
+  
+</menu>
