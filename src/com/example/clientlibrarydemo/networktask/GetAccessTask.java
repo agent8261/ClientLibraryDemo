@@ -24,7 +24,8 @@ public class GetAccessTask extends NetworkTask
   {
     
     byte [] data = NetworkIO.getAccess();
-    dataStr = new String(data, Charset.forName("UTF-8"));
+    if(data != null)
+      dataStr = new String(data, Charset.forName("UTF-8"));
     return null;
   }
   

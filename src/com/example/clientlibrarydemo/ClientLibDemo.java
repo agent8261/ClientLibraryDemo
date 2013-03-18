@@ -10,9 +10,8 @@ import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.LoginActivity;
 import edu.umich.imlc.mydesk.cloud.backend.android.MyDeskUrls;
-import edu.umich.imlc.mydesk.cloud.backend.android.auth.AuthHelper;
+import edu.umich.imlc.mydesk.cloud.backend.android.auth.AuthenticationUtilities;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -74,11 +73,11 @@ public class ClientLibDemo extends Activity
   {    
     switch (item.getItemId()) 
     {
-      case R.id.pickAccount:
+      /*case R.id.pickAccount:
       {
         AuthHelper.startAccountPicker(this);
         return true;
-      }
+      }*/
       case R.id.saveFile:
       {
         File file = new File(getFilesDir(), fileName);
@@ -90,9 +89,6 @@ public class ClientLibDemo extends Activity
       }
       case R.id.login:
       {
-        clear();
-        /*AuthHelper.startAccountPicker(this);
-        return true;*/
         return clearScreenThenLogin();
       } 
       case R.id.getShortList:
@@ -125,12 +121,17 @@ public class ClientLibDemo extends Activity
   protected void onActivityResult
     (final int requestCode, final int resultCode, final Intent data) 
   {
-    AuthHelper.doOnActivityResult(this, requestCode, resultCode, data, textView);
+    AuthenticationUtilities.doOnActivityResult(this, requestCode, resultCode, data);
+  }
+  
+  private boolean clearScreenThenLogin()
+  {
+    return clearScreenThenLoginGAuth();
   }
   
   // ---------------------------------------------------------------------------
   
-  private boolean clearScreenThenLogin()
+  private boolean clearScreenThenLoginWeb()
   {
     clear();
     Intent intent = new Intent(this, LoginActivity.class);
@@ -141,6 +142,24 @@ public class ClientLibDemo extends Activity
     return true;
   }
   
+  // ---------------------------------------------------------------------------
+  
+  private boolean clearScreenThenLoginNick()
+  {
+    clear();
+    //Intent intent = new Intent(this, AccountList.class);
+   // startActivity(intent);
+    return true;
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  private boolean clearScreenThenLoginGAuth()
+  {
+    clear();
+    AuthHelper.startAccountPicker(this);
+    return true;
+  }
   // ---------------------------------------------------------------------------
   
   private boolean clearScreenThenExecuteTask(NetworkTask task)
