@@ -10,12 +10,11 @@ import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.MyDeskUrls;
 import edu.umich.imlc.mydesk.cloud.backend.android.auth.AuthenticationUtilities;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.CookieSyncManager;
@@ -23,7 +22,7 @@ import android.widget.TextView;
 
 public class ClientLibDemo extends Activity
 {
-  private static final int LOGIN_CODE = 144;
+  private final String TAG = "INFO";
   private final String fileName = "A_Binary_File";
   
   private TextView textView = null;
@@ -73,11 +72,6 @@ public class ClientLibDemo extends Activity
   {    
     switch (item.getItemId()) 
     {
-      /*case R.id.pickAccount:
-      {
-        AuthHelper.startAccountPicker(this);
-        return true;
-      }*/
       case R.id.saveFile:
       {
         File file = new File(getFilesDir(), fileName);
@@ -121,6 +115,7 @@ public class ClientLibDemo extends Activity
   protected void onActivityResult
     (final int requestCode, final int resultCode, final Intent data) 
   {
+    Log.i(TAG,"Start Activity Result");
     AuthenticationUtilities.doOnActivityResult(this, requestCode, resultCode, data);
   }
   
@@ -131,19 +126,7 @@ public class ClientLibDemo extends Activity
   
   // ---------------------------------------------------------------------------
   
-  private boolean clearScreenThenLoginWeb()
-  {
-    clear();
-    Intent intent = new Intent(this, LoginActivity.class);
-    Uri.Builder b = new Uri.Builder();
-    Uri uri = b.encodedPath(MyDeskUrls.getAccessUrl()).build();
-    intent.setData(uri);
-    startActivityForResult(intent, LOGIN_CODE);
-    return true;
-  }
-  
-  // ---------------------------------------------------------------------------
-  
+  @SuppressWarnings("unused")
   private boolean clearScreenThenLoginNick()
   {
     clear();
@@ -157,7 +140,9 @@ public class ClientLibDemo extends Activity
   private boolean clearScreenThenLoginGAuth()
   {
     clear();
-    AuthHelper.startAccountPicker(this);
+    Log.i(TAG, "Starting Account Picker");
+    textView.append("Starting Account Picker\n");
+    AuthenticationUtilities.startAccountPicker(this);
     return true;
   }
   // ---------------------------------------------------------------------------
