@@ -2,7 +2,9 @@ package com.example.clientlibrarydemo.networktask;
 
 import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.FileNotFound;
+import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NoMyDeskAccount;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyID;
+import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.UnauthorizedAccess;
 
 import android.widget.TextView;
 
@@ -30,6 +32,16 @@ public class LoadFileTask extends NetworkTask
     }
     catch( FileNotFound e )
     {
+      e.printStackTrace();
+    }
+    catch( NoMyDeskAccount e )
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    catch( UnauthorizedAccess e )
+    {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;

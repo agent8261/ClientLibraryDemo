@@ -3,8 +3,10 @@ package com.example.clientlibrarydemo.networktask;
 import edu.umich.imlc.mydesk.MyDeskProtocolBuffer.FileMetaData_PB;
 import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.FileNotFound;
+import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NoMyDeskAccount;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyField;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyID;
+import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.UnauthorizedAccess;
 import android.widget.TextView;
 
 public class GetMetaTask extends NetworkTask
@@ -39,6 +41,16 @@ public class GetMetaTask extends NetworkTask
     }
     catch( FileNotFound e )
     {
+      e.printStackTrace();
+    }
+    catch( NoMyDeskAccount e )
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    catch( UnauthorizedAccess e )
+    {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;

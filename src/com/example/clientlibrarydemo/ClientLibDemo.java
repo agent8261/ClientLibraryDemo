@@ -10,7 +10,8 @@ import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.auth.AuthenticationUtilities;
+import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginUtilities;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -116,7 +117,7 @@ public class ClientLibDemo extends Activity
     (final int requestCode, final int resultCode, final Intent data) 
   {
     Log.i(TAG,"Start Activity Result");
-    AuthenticationUtilities.doOnActivityResult(this, requestCode, resultCode, data);
+    LoginUtilities.doOnActivityResult(this, requestCode, resultCode, data);
   }
   
   private boolean clearScreenThenLogin()
@@ -142,7 +143,7 @@ public class ClientLibDemo extends Activity
     clear();
     Log.i(TAG, "Starting Account Picker");
     textView.append("Starting Account Picker\n");
-    AuthenticationUtilities.startAccountPicker(this);
+    LoginUtilities.startAccountPicker(this);
     return true;
   }
   // ---------------------------------------------------------------------------
