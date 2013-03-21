@@ -36,12 +36,10 @@ public class LoadFileTask extends NetworkTask
     }
     catch( NoMyDeskAccount e )
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     catch( UnauthorizedAccess e )
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;

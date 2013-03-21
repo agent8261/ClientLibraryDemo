@@ -58,13 +58,11 @@ public class SaveFileTask extends NetworkTask
     }
     catch( NoMyDeskAccount e )
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      message = e.getMessage();
     }
     catch( UnauthorizedAccess e )
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      message = e.getMessage();
     }
     return null;
   }
