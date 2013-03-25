@@ -8,10 +8,10 @@ import java.io.IOException;
 
 import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.FileNotFound;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NoMyDeskAccount;
+//import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NoMyDeskAccount;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyField;
 import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyID;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.UnauthorizedAccess;
+//import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.UnauthorizedAccess;
 
 import android.widget.TextView;
 
@@ -56,14 +56,14 @@ public class SaveFileTask extends NetworkTask
       message = e.getMessage();
       //e.printStackTrace();
     }
-    catch( NoMyDeskAccount e )
+/*    catch( NoMyDeskAccount e )
     {
       message = e.getMessage();
     }
     catch( UnauthorizedAccess e )
     {
       message = e.getMessage();
-    }
+    }*/
     return null;
   }
 
