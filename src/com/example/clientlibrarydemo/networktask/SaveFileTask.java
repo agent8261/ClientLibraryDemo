@@ -34,7 +34,7 @@ public class SaveFileTask extends NetworkTask
   @Override
   protected Void doInBackground(Void... params)
   {
-    createByteFile(filePath);
+    //createByteFile(filePath);
     String fileId = generateFileIDString();
     LoadFileTask.setFileID(fileId);
     try
@@ -44,26 +44,18 @@ public class SaveFileTask extends NetworkTask
     catch( NullOrEmptyField e )
     {
       message = e.getMessage();
-      //e.printStackTrace();
+      e.printStackTrace();
     }
     catch( NullOrEmptyID e )
     {
       message = e.getMessage();
-      //e.printStackTrace();
+      e.printStackTrace();
     }
     catch( FileNotFound e )
     {
       message = e.getMessage();
-      //e.printStackTrace();
+      e.printStackTrace();
     }
-/*    catch( NoMyDeskAccount e )
-    {
-      message = e.getMessage();
-    }
-    catch( UnauthorizedAccess e )
-    {
-      message = e.getMessage();
-    }*/
     return null;
   }
 
@@ -75,7 +67,8 @@ public class SaveFileTask extends NetworkTask
       println(message);
       return;
     }
-    verifyFile(filePath);
+    println("Save File Task Done");
+    //verifyFile(filePath);
   }
   
   //===========================================================================

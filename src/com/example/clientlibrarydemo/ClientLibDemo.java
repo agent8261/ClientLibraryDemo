@@ -13,6 +13,7 @@ import com.example.clientlibrarydemo.networktask.SaveFileTask;
 //import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginUtilities;
 
 import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
@@ -24,7 +25,9 @@ import android.widget.TextView;
 public class ClientLibDemo extends Activity
 {
   private final String TAG = "INFO";
-  private final String fileName = "A_Binary_File";
+  private final String fileName = "Short.flac";
+  @SuppressLint("SdCardPath")
+  private final String filePath = "/sdcard/";
   
   private TextView textView = null;
   
@@ -75,7 +78,7 @@ public class ClientLibDemo extends Activity
     {
       case R.id.saveFile:
       {
-        File file = new File(getFilesDir(), fileName);
+        File file = new File(filePath, fileName);
         return clearScreenThenExecuteTask(new SaveFileTask(textView, file, fileName));
       }
       case R.id.loadFile:
