@@ -8,17 +8,5 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="textUri">hello</string>
     <string name="defaultText">Default Text</string>
-    <string name="btnText">Test</string>
-    <string name="doSecureGet">Do Secure Get</string>
-    <string name="fileMenu">File Menu</string>
-    <string name="getMetaData">Get Meta Data</string>
-    <string name="saveFile">Save File</string>
-    <string name="getShortList">Get File Short Info</string>
-    <string name="loadFile">Load File</string>
-    <string name="login">login</string>
-    <string name="pickAccount">Choose Account</string>
-    <string name="exit">exit</string>
-    <string name="NetworkIO">Network IO</string>
-    <string name="checkConnection">Check Connection</string>
     
 </resources>

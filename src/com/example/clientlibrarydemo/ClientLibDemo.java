@@ -2,6 +2,11 @@ package com.example.clientlibrarydemo;
 
 import java.io.File;
 
+import org.alljoyn.bus.BusAttachment;
+import org.alljoyn.bus.BusException;
+import org.alljoyn.bus.ProxyBusObject;
+import org.alljoyn.bus.Status;
+
 import com.example.clientlibrarydemo.networktask.CheckConnectionTask;
 import com.example.clientlibrarydemo.networktask.GetAccessTask;
 import com.example.clientlibrarydemo.networktask.GetMetaTask;
@@ -10,7 +15,11 @@ import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
 
-//import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginUtilities;
+import edu.umich.imlc.mydesk.cloud.alljoyn.service.HelloService;
+import edu.umich.imlc.mydesk.cloud.alljoyn.service.ServiceApi;
+import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginListener;
+import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginUtilities;
+import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.SystemException;
 
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -19,20 +28,108 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.CookieSyncManager;
 import android.widget.TextView;
 
 public class ClientLibDemo extends Activity
 {
-  private final String TAG = "INFO";
-  private final String fileName = "Short.flac";
+  static
+  { System.loadLibrary("alljoyn_java"); }
+    
+  private final String TAG = ClientLibDemo.class.getSimpleName();
+  static final String HANDLER_NAME = "BusHandler";
+  private static final String BUS_ATTACHMENT_NAME = "App Name";
+
+  //public static final String fileName = "Short.flac";
+  public static final String fileName = "demoFile_Name";
+  public static final String fileID = "demoFile_ID";
+  public static final String fileType = "demoFile_type";
+  
   @SuppressLint("SdCardPath")
-  private final String filePath = "/sdcard/";
+  private final String filePathStr = "/sdcard/";
   
   private TextView textView = null;
+  boolean loggedIn = false;
+  
+  ServiceApi alljoynSrvc = null;
+  BusAttachment mBus = null;
+  File filePath;
   
   // ----------------------------------------------------------------------------
   // ----------------------------------------------------------------------------
+  
+  boolean startService()
+  {
+    Intent intent = new Intent(this, HelloService.class);
+    startService(intent);    
+    return true;
+  }
+  
+  // ----------------------------------------------------------------------------
+  
+  boolean createInterface()
+  {
+    try
+    {      
+      Util.printMethodName();
+      mBus = new BusAttachment(BUS_ATTACHMENT_NAME);
+      Status status = mBus.connect();
+      checkStatus(status, "Connect Failed: " + status);
+      
+      ProxyBusObject mProxyObj;
+      mProxyObj = mBus.getProxyBusObject(ServiceApi.I_NAME,
+          ServiceApi.BUS_OBJ_PATH_NAME,
+          BusAttachment.SESSION_ID_ANY,
+          new Class[] { ServiceApi.class });
+  
+      alljoynSrvc = mProxyObj.getInterface(ServiceApi.class);
+      assert(alljoynSrvc != null);
+      Log.i(TAG, "Created Interface");
+    }
+    catch(SystemException e)
+    {
+      e.printStackTrace();
+    }
+    return true;
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  boolean doAllJoyn_NetTest()
+  {
+    try
+    {
+      alljoynSrvc.doAccessTest();
+    }
+    catch( BusException e )
+    { Log.e(TAG, e.getMessage(), e); }
+    return true;    
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  boolean doAllJoynTest()
+  {
+    try
+    {
+      alljoynSrvc.doAllJoynTest();
+    }
+    catch( BusException e )
+    { Log.e(TAG, e.getMessage(), e); }
+    return true;
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  void checkStatus(Status status, String msg) throws SystemException
+  {
+    if (Status.OK != status) 
+    {
+      Log.e(TAG, msg);
+      throw new SystemException(msg);
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
   
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -40,7 +137,8 @@ public class ClientLibDemo extends Activity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_client_lib_demo);
     textView = (TextView)findViewById(R.id.textView1);
-    CookieSyncManager.createInstance(getApplicationContext());
+    
+    filePath = new File(getExternalFilesDir(null), fileName);
   }
 
   // ---------------------------------------------------------------------------
@@ -76,35 +174,37 @@ public class ClientLibDemo extends Activity
   {    
     switch (item.getItemId()) 
     {
-      case R.id.saveFile:
-      {
-        File file = new File(filePath, fileName);
-        return clearScreenThenExecuteTask(new SaveFileTask(textView, file, fileName));
-      }
-      case R.id.loadFile:
-      {
-        return clearScreenThenExecuteTask(new LoadFileTask(textView));
-      }
+      // Authentication
       case R.id.login:
-      {
         return clearScreenThenLogin();
-      } 
-      case R.id.getShortList:
-      {
-        return clearScreenThenExecuteTask(new GetShortInfoTask(textView));
-      }
-      case R.id.getMetaData:
-      {
-        return clearScreenThenExecuteTask(new GetMetaTask(textView));
-      }
-      case R.id.doSecureGet:
-      {
+      case R.id.verifyLogin:
         return clearScreenThenExecuteTask(new GetAccessTask(textView));
-      }
       case R.id.checkConnection:
-      {
         return clearScreenThenExecuteTask(new CheckConnectionTask(textView));
-      }
+      
+      // All-Joyn
+      case R.id.strt_srvc:
+        return startService();
+      case R.id.new_Interface:
+        return createInterface();
+      case R.id.doTest:
+        return doAllJoynTest();
+      case R.id.doNetTest:
+        return doAllJoyn_NetTest();
+
+      // File Operations
+      case R.id.createFile:
+        return clearScreenThenExecuteTask(new SaveFileTask(textView, filePath));
+      case R.id.loadFile:
+        return clearScreenThenExecuteTask(new LoadFileTask(textView, filePath));
+      //case R.id.overWriteFile:
+        //return true;
+      case R.id.getMetaData:
+        return clearScreenThenExecuteTask(new GetMetaTask(textView));
+      case R.id.getShortList:
+        return clearScreenThenExecuteTask(new GetShortInfoTask(textView));
+        
+      // Misc
       case R.id.exit:
       {
         finish();
@@ -119,19 +219,49 @@ public class ClientLibDemo extends Activity
   protected void onActivityResult
     (final int requestCode, final int resultCode, final Intent data) 
   {
-    Log.i(TAG,"Start Activity Result");
-    //LoginUtilities.doOnActivityResult(this, requestCode, resultCode, data);
+    LoggedCallback cb = new LoggedCallback();
+    LoginUtilities.doOnActivityResult(this, requestCode, resultCode, data, cb);
   }
+  
+  // ---------------------------------------------------------------------------
   
   private boolean clearScreenThenLogin()
   {
     return clearScreenThenLoginGAuth();
   }
+ 
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  
+  class LoggedCallback implements LoginListener
+  {
+
+    @Override
+    public void onSuccess(String accountName)
+    {
+      Log.i(TAG, "Logged Successful");
+    }
+
+    @Override
+    public void onFailure(Throwable e)
+    { Log.e(TAG, e.getMessage(), e); }
+    
+  }
   
   // ---------------------------------------------------------------------------
   
-  @SuppressWarnings("unused")
-  private boolean clearScreenThenLoginNick()
+  @Override
+  public void onDestroy()
+  {
+    super.onDestroy();
+    Util.printMethodName();
+    Intent intent = new Intent(this, HelloService.class);
+    stopService(intent);
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  boolean clearScreenThenLoginNick()
   {
     clear();
     //Intent intent = new Intent(this, AccountList.class);
@@ -146,7 +276,7 @@ public class ClientLibDemo extends Activity
     clear();
     Log.i(TAG, "Starting Account Picker");
     textView.append("Starting Account Picker\n");
-    //LoginUtilities.startAccountPicker(this);
+    LoginUtilities.startAccountPicker(this, false);
     return true;
   }
   // ---------------------------------------------------------------------------
@@ -160,58 +290,8 @@ public class ClientLibDemo extends Activity
 
   // ---------------------------------------------------------------------------
   
-  protected void clear()
+  void clear()
   {
     textView.setText("");
   }
-  
-  // ---------------------------------------------------------------------------
-  
-  protected void println(String text)
-  {
-    textView.append(text +"\n"); 
-  }
-  
-  // ---------------------------------------------------------------------------
-  protected void print(String text)
-  {
-    textView.append(text);
-  }
-  
-  /*
-  private void makePb()
-  {
-    FileShortInfoList_PB.Builder iBuilder = FileShortInfoList_PB.newBuilder();
-    String id = "test";
-    long seq = 0;
-    
-    FileShortInfoList_PB info = iBuilder.addFileShortInfo(FileShortInfo_PB.newBuilder().setFileID(id).setSequenceNumber(seq).build()).build();
-    printByteArray(info.toByteArray());
-  }
-  
-  private static void printByteArray(byte [] bArr)
-  {
-    int i=0;
-    for(byte b: bArr)
-    {
-      String bStr = toHexString(b);
-      System.out.print(bStr);
-      if((i%4) == 3 )
-      {
-        System.out.print("\n");
-      }
-      else
-      {
-        System.out.print(".");
-      }
-      i++;
-    }
-    System.out.print("\n");
-  }
-  
-  private static String toHexString(byte b)
-  {
-    return String.format("%02X ", b);  
-  }
-  */
 }

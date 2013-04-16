@@ -31,11 +31,11 @@ public class CheckConnectionTask extends NetworkTask
   {
     if(on)
     {
-      println("True");
+      println("True: Connected");
     }
     else
     {
-      println("False");
+      println("False: Can't Reach Server");
     }
   }
 

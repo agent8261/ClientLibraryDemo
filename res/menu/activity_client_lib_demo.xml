@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-  <item android:id="@+id/fileMenu" android:title="@string/fileMenu" >
-  <menu>
-    <item android:id="@+id/saveFile" android:title="@string/saveFile"  />
-    <item android:id="@+id/loadFile" android:title="@string/loadFile" />
-    <item android:id="@+id/getMetaData" android:title="@string/getMetaData" />    
-    <item android:id="@+id/getShortList" android:title="@string/getShortList" />
-  </menu>
+  <item android:id="@+id/fileMenu" android:title="File" >
+    <menu>
+      <item android:id="@+id/createFile" android:title="Create New File"  />
+      <item android:id="@+id/overWriteFile" android:title="Over-Write File"  />
+      <item android:id="@+id/loadFile" android:title="Load File" />
+      <item android:id="@+id/getMetaData" android:title="Get Meta-Data" />    
+      <item android:id="@+id/getShortList" android:title="Get Short List" />
+    </menu>
   </item>
   
-  <item android:id="@+id/NetworkIO" android:title="@string/NetworkIO">
-  <menu>
-    <item android:id="@+id/login" android:title="@string/login" />
-    <item android:id="@+id/doSecureGet" android:title="@string/doSecureGet" />
-    <item android:id="@+id/checkConnection" android:title="@string/checkConnection"/>
-  </menu>
+  <item android:id="@+id/NetworkIO" android:title="Network Ops">
+    <menu>
+      <item android:id="@+id/login" android:title="Login" />
+      <item android:id="@+id/verifyLogin" android:title="Verify Login" />
+      <item android:id="@+id/checkConnection" android:title="Get Server Time"/>
+    </menu>
   </item>
   
-  <item android:id="@+id/pickAccount" android:title="@string/pickAccount" />
-  <item android:id="@+id/exit" android:title="@string/exit"/>
+  <item android:id="@+id/All_Joyn" android:title="All_Joyn">
+    <menu>
+      <item android:id="@+id/strt_srvc" android:title="Start Service" />
+      <item android:id="@+id/new_Interface" android:title="Make Interface" />
+      <item android:id="@+id/doTest" android:title="Do Test" />
+      <item android:id="@+id/doNetTest" android:title="Do Net Test" />
+    </menu>  
+  </item>
+  
+  <item android:id="@+id/exit" android:title="Exit"/>
   
 </menu>

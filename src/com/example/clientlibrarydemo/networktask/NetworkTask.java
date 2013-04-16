@@ -1,6 +1,5 @@
 package com.example.clientlibrarydemo.networktask;
 
-
 import android.os.AsyncTask;
 import android.widget.TextView;
 
@@ -24,7 +23,7 @@ public abstract class NetworkTask extends AsyncTask<Void, Void, Void>
   
   protected void println(String text)
   {
-    textView.append(text +"\n"); 
+    textView.append(text +"\n");
   }
   
   protected void print(String text)

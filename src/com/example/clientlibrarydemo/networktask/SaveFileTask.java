@@ -1,149 +1,73 @@
 package com.example.clientlibrarydemo.networktask;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.FileNotFound;
-//import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NoMyDeskAccount;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyField;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.NullOrEmptyID;
-//import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.UnauthorizedAccess;
+import com.example.clientlibrarydemo.ClientLibDemo;
+import com.example.clientlibrarydemo.FileOpsDemo;
 
+import edu.umich.imlc.mydesk.cloud.backend.android.utilities.Util;
+
+import android.util.Log;
 import android.widget.TextView;
 
 public class SaveFileTask extends NetworkTask
 {
-  private static final int byteSize = 16;
-  private static final String fileType = "bin";
-  private String fileName;
-  private String message = null;
-  
+  private static final String TAG = SaveFileTask.class.getSimpleName();
   private File filePath;
+  String resultStr;
   
-  public SaveFileTask(TextView textView_, File filePath_, String fileName_)
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  
+  public SaveFileTask(TextView textView_, File filePath_)
   {
     super(textView_);
     filePath = filePath_;
-    fileName = fileName_;
   }
 
+  // --------------------------------------------------------------------------
+  
   @Override
   protected Void doInBackground(Void... params)
   {
-    //createByteFile(filePath);
-    String fileId = generateFileIDString();
-    LoadFileTask.setFileID(fileId);
+    Util.printMethodName();
     try
     {
-      NetworkIO.storeFile(filePath, fileId, fileName, fileType);
+      createByteFile(filePath);
+      resultStr = FileOpsDemo.doStoreFile
+          (filePath, ClientLibDemo.fileID, ClientLibDemo.fileName, ClientLibDemo.fileType);
+      Log.i(TAG, resultStr);
     }
-    catch( NullOrEmptyField e )
+    catch(IOException e)
     {
-      message = e.getMessage();
-      e.printStackTrace();
-    }
-    catch( NullOrEmptyID e )
-    {
-      message = e.getMessage();
-      e.printStackTrace();
-    }
-    catch( FileNotFound e )
-    {
-      message = e.getMessage();
-      e.printStackTrace();
+      resultStr = "IO Exception";
+      Log.e(TAG, resultStr, e);
     }
     return null;
   }
-
+  
+  // --------------------------------------------------------------------------
+  
   @Override
   protected void onPostExecute(Void result)
   {
-    if(message != null)
-    {
-      println(message);
-      return;
-    }
-    println("Save File Task Done");
-    //verifyFile(filePath);
+    Util.printMethodName();
+    println("Save File Task Done. Result:");
+    println(resultStr);
   }
-  
-  //===========================================================================
-  // Verify the binary file worked
-  void verifyFile(File fileObj)
-  {
-    FileInputStream file = null;
-    println("Verifying Save File");
-    try
-    {
-      file = new FileInputStream(fileObj);
-      byte[] data = new byte[byteSize];
-      file.read(data);
-      int i = 0;
-      for( byte b : data )
-      {
-        print(""+ b + " ");
-        if( (i % 4) == 3 )
-        { println(""); }
-        i++;
-      }
-      println("End Byte File");
-    }
-    catch( FileNotFoundException e )
-    { e.printStackTrace();  }
-    catch( IOException e )
-    { e.printStackTrace();  }
-    finally
-    {
-      if( file != null )
-      {
-        try
-        { file.close(); }
-        catch( IOException e )
-        { e.printStackTrace();  }
-      }
-    }
-    println("Save File Task Done");    
-  }
-  
-  //===========================================================================
-  // Create some binary data to send to the server
-  public void createByteFile(File fileObj)
-  {
-    FileOutputStream file;
-    try
-    {
-      file = new FileOutputStream(fileObj);
-      byte [] data = new byte [byteSize];
-      data[0] = 6;   data[1] = 8;   data[2] = 2;   data[3] = 1;
-      data[4] = 6;   data[5] = 8;   data[6] = 2;   data[7] = 1;
-      data[8] = -6;  data[9] = -8;  data[10] = -2; data[11] = -1;
-      data[12] = -6; data[13] = -8; data[14] = -2; data[15] = -1;
-
-      file.write(data, 0, byteSize);
-      file.close();      
-      //println("Create Byte File Done");
-    }
-    catch( FileNotFoundException e )
-    {
-      //println("File not found");
-      e.printStackTrace();
-    }
-    catch( IOException e )
-    {
-      //println("IOException");
-      e.printStackTrace();
-    }
     
+  // --------------------------------------------------------------------------
+  // Create some binary data to send to the server
+  public void createByteFile(File fileObj) 
+      throws IOException
+  {
+    Util.printMethodName();
+    FileOutputStream file = new FileOutputStream(fileObj);
+    byte [] data = FileOpsDemo.createTestBytes();
+    file.write(data, 0, data.length);
+    file.close();    
   }
   
-  public static String generateFileIDString()
-  {
-    return "RandomFileID";
-    //return UUID.randomUUID().toString() + "||" + UUID.randomUUID().toString();
-  }// generateFileIDString
-
 }
