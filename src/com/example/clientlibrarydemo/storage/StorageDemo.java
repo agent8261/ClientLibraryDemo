@@ -13,7 +13,9 @@ import com.example.clientlibrarydemo.Util;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SyncStatusObserver;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,6 +49,19 @@ public class StorageDemo
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   
+  public class Observer implements SyncStatusObserver
+  {
+    @Override
+    public void onStatusChanged(int code)
+    {
+      Util.printMethodName();
+      Log.i("SyncStatus", String.format("Status: %d", code));
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  
   public StorageDemo(Activity activity)
   {
     Util.printMethodName();
@@ -59,6 +74,10 @@ public class StorageDemo
     textView = (TextView)activity.findViewById(R.id.textView1);
     api = new GenericStorageApi(context);
     createSomeFiles(activity);
+    Observer o = new Observer();
+    ContentResolver.addStatusChangeListener(
+        ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE & ContentResolver.SYNC_OBSERVER_TYPE_PENDING & ContentResolver.SYNC_OBSERVER_TYPE_SETTINGS,
+        o); 
   }
   
   // ---------------------------------------------------------------------------
@@ -89,7 +108,8 @@ public class StorageDemo
   public void doLogin()
   {
     Util.printMethodName();
-    api.startLoginActivity();
+    //api.startLoginActivity();
+    api.loginChooseAccount();
   }
   
   // ---------------------------------------------------------------------------
