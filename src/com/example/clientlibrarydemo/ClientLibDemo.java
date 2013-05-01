@@ -2,24 +2,19 @@ package com.example.clientlibrarydemo;
 
 import java.io.File;
 
-import org.alljoyn.bus.BusAttachment;
-import org.alljoyn.bus.BusException;
-import org.alljoyn.bus.ProxyBusObject;
-import org.alljoyn.bus.Status;
-
 import com.example.clientlibrarydemo.networktask.CheckConnectionTask;
 import com.example.clientlibrarydemo.networktask.GetAccessTask;
 import com.example.clientlibrarydemo.networktask.GetMetaTask;
 import com.example.clientlibrarydemo.networktask.GetShortInfoTask;
 import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
+import com.example.clientlibrarydemo.networktask.OverWriteFileTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
+import com.example.clientlibrarydemo.storage.StorageDemo;
 
-import edu.umich.imlc.mydesk.cloud.alljoyn.service.HelloService;
-import edu.umich.imlc.mydesk.cloud.alljoyn.service.ServiceApi;
-import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginListener;
-import edu.umich.imlc.mydesk.cloud.backend.android.auth.LoginUtilities;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.SystemException;
+import edu.umich.imlc.mydesk.cloud.android.auth.LoginCallback;
+import edu.umich.imlc.mydesk.cloud.android.auth.LoginUtilities;
+
 
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -32,104 +27,32 @@ import android.widget.TextView;
 
 public class ClientLibDemo extends Activity
 {
-  static
-  { System.loadLibrary("alljoyn_java"); }
-    
   private final String TAG = ClientLibDemo.class.getSimpleName();
   static final String HANDLER_NAME = "BusHandler";
-  private static final String BUS_ATTACHMENT_NAME = "App Name";
 
   //public static final String fileName = "Short.flac";
   public static final String fileName = "demoFile_Name";
   public static final String fileID = "demoFile_ID";
   public static final String fileType = "demoFile_type";
   
+  public static final String overwriteName = "Another_File_name";
+  public static final String storeName = "CopyOfDemo";
+  
   @SuppressLint("SdCardPath")
   private final String filePathStr = "/sdcard/";
   
   private TextView textView = null;
+  
+  StorageDemo storageDemo = null;
+  
   boolean loggedIn = false;
   
-  ServiceApi alljoynSrvc = null;
-  BusAttachment mBus = null;
-  File filePath;
+  File orginalPath;
+  File overwritePath;
+  File storedPath;
   
   // ----------------------------------------------------------------------------
   // ----------------------------------------------------------------------------
-  
-  boolean startService()
-  {
-    Intent intent = new Intent(this, HelloService.class);
-    startService(intent);    
-    return true;
-  }
-  
-  // ----------------------------------------------------------------------------
-  
-  boolean createInterface()
-  {
-    try
-    {      
-      Util.printMethodName();
-      mBus = new BusAttachment(BUS_ATTACHMENT_NAME);
-      Status status = mBus.connect();
-      checkStatus(status, "Connect Failed: " + status);
-      
-      ProxyBusObject mProxyObj;
-      mProxyObj = mBus.getProxyBusObject(ServiceApi.I_NAME,
-          ServiceApi.BUS_OBJ_PATH_NAME,
-          BusAttachment.SESSION_ID_ANY,
-          new Class[] { ServiceApi.class });
-  
-      alljoynSrvc = mProxyObj.getInterface(ServiceApi.class);
-      assert(alljoynSrvc != null);
-      Log.i(TAG, "Created Interface");
-    }
-    catch(SystemException e)
-    {
-      e.printStackTrace();
-    }
-    return true;
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  boolean doAllJoyn_NetTest()
-  {
-    try
-    {
-      alljoynSrvc.doAccessTest();
-    }
-    catch( BusException e )
-    { Log.e(TAG, e.getMessage(), e); }
-    return true;    
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  boolean doAllJoynTest()
-  {
-    try
-    {
-      alljoynSrvc.doAllJoynTest();
-    }
-    catch( BusException e )
-    { Log.e(TAG, e.getMessage(), e); }
-    return true;
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  void checkStatus(Status status, String msg) throws SystemException
-  {
-    if (Status.OK != status) 
-    {
-      Log.e(TAG, msg);
-      throw new SystemException(msg);
-    }
-  }
-  
-  // ---------------------------------------------------------------------------
   
   @Override
   protected void onCreate(Bundle savedInstanceState)
@@ -138,7 +61,10 @@ public class ClientLibDemo extends Activity
     setContentView(R.layout.activity_client_lib_demo);
     textView = (TextView)findViewById(R.id.textView1);
     
-    filePath = new File(getExternalFilesDir(null), fileName);
+    orginalPath = new File(getExternalFilesDir(null), fileName);
+    overwritePath = new File(getExternalFilesDir(null), overwriteName);
+    storedPath = new File(getExternalFilesDir(null), storeName);    
+    storageDemo = new StorageDemo(this);
   }
 
   // ---------------------------------------------------------------------------
@@ -149,22 +75,6 @@ public class ClientLibDemo extends Activity
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.activity_client_lib_demo, menu);
     return true;
-  }
-
-  // ---------------------------------------------------------------------------
-  
-  @Override
-  protected void onResume()
-  {
-    super.onResume();
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  @Override
-  protected void onStart()
-  {
-    super.onStart();
   }
   
   // ---------------------------------------------------------------------------
@@ -181,28 +91,27 @@ public class ClientLibDemo extends Activity
         return clearScreenThenExecuteTask(new GetAccessTask(textView));
       case R.id.checkConnection:
         return clearScreenThenExecuteTask(new CheckConnectionTask(textView));
-      
-      // All-Joyn
-      case R.id.strt_srvc:
-        return startService();
-      case R.id.new_Interface:
-        return createInterface();
-      case R.id.doTest:
-        return doAllJoynTest();
-      case R.id.doNetTest:
-        return doAllJoyn_NetTest();
-
       // File Operations
       case R.id.createFile:
-        return clearScreenThenExecuteTask(new SaveFileTask(textView, filePath));
+        return clearScreenThenExecuteTask(new SaveFileTask(textView, orginalPath));
       case R.id.loadFile:
-        return clearScreenThenExecuteTask(new LoadFileTask(textView, filePath));
-      //case R.id.overWriteFile:
-        //return true;
+        return clearScreenThenExecuteTask(new LoadFileTask(textView, storedPath));
+      case R.id.overWriteFile:
+        return clearScreenThenExecuteTask(new OverWriteFileTask(textView, overwritePath));
       case R.id.getMetaData:
         return clearScreenThenExecuteTask(new GetMetaTask(textView));
       case R.id.getShortList:
         return clearScreenThenExecuteTask(new GetShortInfoTask(textView));
+      
+      // Storage Srvc
+      case R.id.srvcLogin:
+        storageDemo.doLogin(); return true;
+      case R.id.srvcCreate:
+        storageDemo.createFiles(); return true;
+      case R.id.srvcSave:
+        storageDemo.saveFiles();  return true;
+      case R.id.srvcSync:
+        storageDemo.sync(); return true;
         
       // Misc
       case R.id.exit:
@@ -212,6 +121,15 @@ public class ClientLibDemo extends Activity
       }
     }
     return super.onOptionsItemSelected(item);
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  @Override
+  public void onDestroy()
+  {
+    super.onDestroy();
+    Util.printMethodName();
   }
   
   // ---------------------------------------------------------------------------
@@ -227,58 +145,13 @@ public class ClientLibDemo extends Activity
   
   private boolean clearScreenThenLogin()
   {
-    return clearScreenThenLoginGAuth();
-  }
- 
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  
-  class LoggedCallback implements LoginListener
-  {
-
-    @Override
-    public void onSuccess(String accountName)
-    {
-      Log.i(TAG, "Logged Successful");
-    }
-
-    @Override
-    public void onFailure(Throwable e)
-    { Log.e(TAG, e.getMessage(), e); }
-    
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  @Override
-  public void onDestroy()
-  {
-    super.onDestroy();
-    Util.printMethodName();
-    Intent intent = new Intent(this, HelloService.class);
-    stopService(intent);
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  boolean clearScreenThenLoginNick()
-  {
     clear();
-    //Intent intent = new Intent(this, AccountList.class);
-   // startActivity(intent);
-    return true;
-  }
-  
-  // ---------------------------------------------------------------------------
-  
-  private boolean clearScreenThenLoginGAuth()
-  {
-    clear();
-    Log.i(TAG, "Starting Account Picker");
-    textView.append("Starting Account Picker\n");
+    Log.i(TAG, "Begin Login...");
+    textView.append("Begin Login..\n");
     LoginUtilities.startAccountPicker(this, false);
     return true;
   }
+ 
   // ---------------------------------------------------------------------------
   
   private boolean clearScreenThenExecuteTask(NetworkTask task)
@@ -294,4 +167,25 @@ public class ClientLibDemo extends Activity
   {
     textView.setText("");
   }
+  
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  
+  class LoggedCallback implements LoginCallback
+  {
+
+    @Override
+    public void onSuccess(String accountName)
+    {
+      Log.i(TAG, "Logged Successful");
+      textView.append(accountName);
+    }
+
+    @Override
+    public void onFailure(Exception e)
+    { Log.e(TAG, e.getMessage(), e); }
+    
+  }
+  
+  // ---------------------------------------------------------------------------
 }

@@ -1,6 +1,6 @@
 package com.example.clientlibrarydemo.networktask;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
+import edu.umich.imlc.mydesk.cloud.client.network.NetworkOps;
 import android.widget.TextView;
 
 public class CheckConnectionTask extends NetworkTask
@@ -20,7 +20,7 @@ public class CheckConnectionTask extends NetworkTask
   @Override
   protected Void doInBackground(Void... params)
   {
-    on = NetworkIO.isConnected();
+    on = NetworkOps.isConnected();
     return null;
   }
 

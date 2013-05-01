@@ -3,20 +3,23 @@ package com.example.clientlibrarydemo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import android.util.Log;
-
 import edu.umich.imlc.mydesk.MyDeskProtocolBuffer.FileMetaData_PB;
 import edu.umich.imlc.mydesk.MyDeskProtocolBuffer.FileMetaData_ShortInfo_PB;
-import edu.umich.imlc.mydesk.cloud.backend.android.NetworkIO;
-import edu.umich.imlc.mydesk.cloud.backend.android.exceptions.Exception_DS;
-import edu.umich.imlc.mydesk.cloud.backend.android.utilities.Util;
+import edu.umich.imlc.mydesk.cloud.client.exceptions.Exception_DS;
+import edu.umich.imlc.mydesk.cloud.client.exceptions.UserHasNoMyDeskAccount;
+import edu.umich.imlc.mydesk.cloud.client.network.NetUtil;
+import edu.umich.imlc.mydesk.cloud.client.network.NetworkOps;
+
+import android.annotation.SuppressLint;
+import android.util.Log;
+
 
 /**
  * Test bed of File Operations
@@ -31,6 +34,29 @@ public class FileOpsDemo
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   
+  public static String validateCookie()
+  {
+    String result = null;
+    
+    try
+    {
+      byte [] data = NetUtil.validateCookie();
+      result = new String(data, Charset.forName("UTF-8"));
+    }
+    catch( UserHasNoMyDeskAccount e )
+    {
+      e.printStackTrace();
+    }
+    catch( IOException e )
+    {
+      e.printStackTrace();
+    }
+    
+    return result;
+  }
+  
+  // --------------------------------------------------------------------------
+  
   public static String createNewFile(File filePath, String fileID, String name, String type)
   {
     Util.printMethodName();
@@ -41,8 +67,20 @@ public class FileOpsDemo
       in = new FileInputStream(filePath);
       String sha = getSHA_1_Sum(in);
       in.close();
-      NetworkIO.createFile(filePath, fileID, name, type);
-      result = "File Created Successfully. Sha: " + sha;
+      FileMetaData_PB meta = NetworkOps.createFile(filePath, fileID, name, type);
+      
+      StringBuffer b = new StringBuffer();
+      b.append(String.format("File Created Successfully. Sha: %s\n", sha));
+      if(meta.hasFileID())
+        b.append(String.format("ID: %s ", meta.getFileID()));
+      else
+        b.append("ID: NONE");
+      
+      if(meta.hasSequenceNumber())
+        b.append(String.format( "Seq Num: %d\n", meta.getSequenceNumber()));
+      else
+        b.append("Seq Num: NONE");
+      result = b.toString();
     }
     catch(Exception_DS e)
     { 
@@ -66,9 +104,41 @@ public class FileOpsDemo
   
   // --------------------------------------------------------------------------
   
-  public void doOverWriteFile()
+  public static String overWriteFile(File filePath, String fileID, String name, String type)
   {
-    // TODO (Darren) Create test function
+    Util.printMethodName();
+    String result = null;
+    FileInputStream in = null;
+    try
+    {
+      in = new FileInputStream(filePath);
+      String sha = getSHA_1_Sum(in);
+      in.close();
+      FileMetaData_PB meta = NetworkOps.overWriteFile(filePath, fileID, name, type);
+      
+      StringBuffer b = new StringBuffer();
+      b.append(String.format("File Created Successfully. Sha: %s\n", sha));
+      b.append(String.format("ID: %s SeqNum: %d\n", meta.getFileID(), meta.getSequenceNumber()));
+      result = b.toString();
+    }
+    catch(Exception_DS e)
+    { 
+      result = e.getMessage();
+      if((result == null) || result.isEmpty())
+      { result = "Failure"; }
+      Log.e(TAG, result, e);
+    }
+    catch( FileNotFoundException e )
+    {
+      result = "Invalid File Path given: File Not Found";
+      Log.e(TAG, result, e);
+    }
+    catch( IOException e )
+    {
+      result = "IO Exception";
+      Log.e(TAG, result, e);
+    }
+    return result;
   }
   
   // --------------------------------------------------------------------------
@@ -79,7 +149,7 @@ public class FileOpsDemo
     String result = null;
     try
     {
-      byte [] data = NetworkIO.getFile(fileID);
+      byte [] data = NetworkOps.getFile(fileID);
       result = getSHA_1_Sum(data);
     }
     catch(Exception_DS e)
@@ -89,20 +159,26 @@ public class FileOpsDemo
       { result = "Failure"; }
       Log.e(TAG, result, e);
     }
+    catch( IOException e )
+    {
+      e.printStackTrace();
+    }
     return result;
   }
   
+  // --------------------------------------------------------------------------
+  
+  @SuppressLint("DefaultLocale")
   public static String doLoadFile(String fileID, File filePath)
   {
     Util.printMethodName();
     String result = null;
     try
     {
-      byte [] data = NetworkIO.getFile(fileID);
-      FileOutputStream out = new FileOutputStream(filePath);
-      out.write(data);
-      out.close();
-      result = getSHA_1_Sum(data);
+      Long seq = NetworkOps.getFile(fileID, filePath);
+      FileInputStream in = new FileInputStream(filePath);
+      String sha = getSHA_1_Sum(in); 
+      result = String.format("Load Successful. Seq: %d Sha: %s\n", seq, sha);
     }
     catch(Exception_DS e)
     { 
@@ -130,7 +206,7 @@ public class FileOpsDemo
     try
     {
       List<FileMetaData_ShortInfo_PB> list;
-      list = NetworkIO.getAllFileShortInfo();
+      list = NetworkOps.getListMetaData();
       StringBuilder b = new StringBuilder();
       
       for(FileMetaData_ShortInfo_PB info: list)
@@ -150,6 +226,10 @@ public class FileOpsDemo
       { result = "Failure"; }
       Log.e(TAG, result, e);
     }
+    catch( IOException e )
+    {
+      e.printStackTrace();
+    }
     return result;
   }
   
@@ -162,7 +242,7 @@ public class FileOpsDemo
     try
     {
       FileMetaData_PB meta;
-      meta = NetworkIO.getFileMetaData(fileID);
+      meta = NetworkOps.getFileMetaData(fileID);
       StringBuilder b = new StringBuilder();
       
       b.append(FILE_ID_HEADER).append(meta.getFileID());
@@ -191,6 +271,11 @@ public class FileOpsDemo
       { result = "Failure"; }
       Log.e(TAG, result, e);
     }
+    catch( IOException e )
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     return result;
   }
   
@@ -207,7 +292,7 @@ public class FileOpsDemo
       String sha = getSHA_1_Sum(in);
       in.close();
       
-      NetworkIO.storeFile(filePath, fileID, name, type);      
+      NetworkOps.storeFile(filePath, fileID, name, type);      
       result = "File Stored Successfully. Sha: " + sha;
     }
     catch(Exception_DS e)

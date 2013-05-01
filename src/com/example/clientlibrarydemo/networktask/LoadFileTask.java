@@ -4,8 +4,8 @@ import java.io.File;
 
 import com.example.clientlibrarydemo.ClientLibDemo;
 import com.example.clientlibrarydemo.FileOpsDemo;
+import com.example.clientlibrarydemo.Util;
 
-import edu.umich.imlc.mydesk.cloud.backend.android.utilities.Util;
 
 import android.util.Log;
 import android.widget.TextView;

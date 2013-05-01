@@ -4,15 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import android.util.Log;
+import android.widget.TextView;
+
 import com.example.clientlibrarydemo.ClientLibDemo;
 import com.example.clientlibrarydemo.FileOpsDemo;
 import com.example.clientlibrarydemo.Util;
 
-
-import android.util.Log;
-import android.widget.TextView;
-
-public class SaveFileTask extends NetworkTask
+public class OverWriteFileTask extends NetworkTask
 {
   private static final String TAG = SaveFileTask.class.getSimpleName();
   private File filePath;
@@ -21,7 +20,7 @@ public class SaveFileTask extends NetworkTask
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   
-  public SaveFileTask(TextView textView_, File filePath_)
+  public OverWriteFileTask(TextView textView_, File filePath_)
   {
     super(textView_);
     filePath = filePath_;
@@ -36,7 +35,7 @@ public class SaveFileTask extends NetworkTask
     try
     {
       createByteFile(filePath);
-      resultStr = FileOpsDemo.createNewFile
+      resultStr = FileOpsDemo.overWriteFile
           (filePath, ClientLibDemo.fileID, ClientLibDemo.fileName, ClientLibDemo.fileType);
       
       //resultStr = FileOpsDemo.doStoreFile
@@ -69,6 +68,8 @@ public class SaveFileTask extends NetworkTask
     Util.printMethodName();
     FileOutputStream file = new FileOutputStream(fileObj);
     byte [] data = FileOpsDemo.createTestBytes();
+    file.write(data, 0, data.length);
+    file.write(data, 0, data.length);
     file.write(data, 0, data.length);
     file.close();    
   }
