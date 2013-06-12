@@ -175,7 +175,6 @@ public class ClientLibDemo extends Activity
   
   class LoggedCallback implements LoginCallback
   {
-
     @Override
     public void onSuccess(String accountName)
     {
@@ -192,8 +191,7 @@ public class ClientLibDemo extends Activity
         AppNeedsUserPermission err = (AppNeedsUserPermission) e;
         startActivity(err.getIntent());
       }
-    }
-    
+    }    
   }
   
   // ---------------------------------------------------------------------------
