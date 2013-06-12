@@ -36,7 +36,7 @@ public class OverWriteFileTask extends NetworkTask
     {
       createByteFile(filePath);
       resultStr = FileOpsDemo.overWriteFile
-          (filePath, ClientLibDemo.fileID, ClientLibDemo.fileName, ClientLibDemo.fileType);
+          (filePath, ClientLibDemo.fileID, ClientLibDemo.fileName, ClientLibDemo.fileType, 1);
       
       //resultStr = FileOpsDemo.doStoreFile
         //  (filePath, ClientLibDemo.fileID, ClientLibDemo.fileName, ClientLibDemo.fileType);

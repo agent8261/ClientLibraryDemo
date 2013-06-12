@@ -104,7 +104,8 @@ public class FileOpsDemo
   
   // --------------------------------------------------------------------------
   
-  public static String overWriteFile(File filePath, String fileID, String name, String type)
+  public static String overWriteFile
+    (File filePath, String fileID, String name, String type, long sequenceNumber)
   {
     Util.printMethodName();
     String result = null;
@@ -114,7 +115,8 @@ public class FileOpsDemo
       in = new FileInputStream(filePath);
       String sha = getSHA_1_Sum(in);
       in.close();
-      FileMetaData_PB meta = NetworkOps.overWriteFile(filePath, fileID, name, type);
+      FileMetaData_PB meta = 
+          NetworkOps.overWriteFile(filePath, fileID, name, type, sequenceNumber);
       
       StringBuffer b = new StringBuffer();
       b.append(String.format("File Created Successfully. Sha: %s\n", sha));
