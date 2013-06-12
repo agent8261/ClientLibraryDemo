@@ -14,6 +14,8 @@ import com.example.clientlibrarydemo.storage.StorageDemo;
 
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginCallback;
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginUtilities;
+import edu.umich.imlc.mydesk.cloud.client.exceptions.AppNeedsUserPermission;
+import edu.umich.imlc.mydesk.cloud.client.utilities.Util;
 
 
 import android.os.Bundle;
@@ -129,7 +131,7 @@ public class ClientLibDemo extends Activity
   public void onDestroy()
   {
     super.onDestroy();
-    Util.printMethodName();
+    Util.printMethodName(TAG);
   }
   
   // ---------------------------------------------------------------------------
@@ -183,7 +185,14 @@ public class ClientLibDemo extends Activity
 
     @Override
     public void onFailure(Exception e)
-    { Log.e(TAG, e.getMessage(), e); }
+    { 
+      Log.e(TAG, e.getMessage(), e);
+      if(e instanceof AppNeedsUserPermission)
+      {
+        AppNeedsUserPermission err = (AppNeedsUserPermission) e;
+        startActivity(err.getIntent());
+      }
+    }
     
   }
   
