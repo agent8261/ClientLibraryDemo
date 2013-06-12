@@ -14,7 +14,7 @@ import com.example.clientlibrarydemo.storage.StorageDemo;
 
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginCallback;
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginUtilities;
-import edu.umich.imlc.mydesk.cloud.client.exceptions.AppNeedsUserPermission;
+import edu.umich.imlc.mydesk.cloud.android.exceptions.AppNeedsUserPermission;
 import edu.umich.imlc.mydesk.cloud.client.utilities.Util;
 
 
