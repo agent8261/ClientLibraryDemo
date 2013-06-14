@@ -10,7 +10,6 @@ import com.example.clientlibrarydemo.networktask.LoadFileTask;
 import com.example.clientlibrarydemo.networktask.NetworkTask;
 import com.example.clientlibrarydemo.networktask.OverWriteFileTask;
 import com.example.clientlibrarydemo.networktask.SaveFileTask;
-import com.example.clientlibrarydemo.storage.StorageDemo;
 
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginCallback;
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginUtilities;
@@ -45,8 +44,6 @@ public class ClientLibDemo extends Activity
   
   private TextView textView = null;
   
-  StorageDemo storageDemo = null;
-  
   boolean loggedIn = false;
   
   File orginalPath;
@@ -66,7 +63,6 @@ public class ClientLibDemo extends Activity
     orginalPath = new File(getExternalFilesDir(null), fileName);
     overwritePath = new File(getExternalFilesDir(null), overwriteName);
     storedPath = new File(getExternalFilesDir(null), storeName);    
-    storageDemo = new StorageDemo(this);
   }
 
   // ---------------------------------------------------------------------------
@@ -104,17 +100,6 @@ public class ClientLibDemo extends Activity
         return clearScreenThenExecuteTask(new GetMetaTask(textView));
       case R.id.getShortList:
         return clearScreenThenExecuteTask(new GetShortInfoTask(textView));
-      
-      // Storage Srvc
-      case R.id.srvcLogin:
-        storageDemo.doLogin(); return true;
-      case R.id.srvcCreate:
-        storageDemo.createFiles(); return true;
-      case R.id.srvcSave:
-        storageDemo.saveFiles();  return true;
-      case R.id.srvcSync:
-        storageDemo.sync(); return true;
-        
       // Misc
       case R.id.exit:
       {

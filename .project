@@ -30,31 +30,4 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>CLIENT_LIBRARY_ANDROID</name>
-			<type>2</type>
-			<locationURI>CLIENT_LIBRARY_ANDROID</locationURI>
-		</link>
-		<link>
-			<name>GENERIC_STORAGE_COMMON</name>
-			<type>2</type>
-			<locationURI>GENERIC_STORAGE_COMMON</locationURI>
-		</link>
-		<link>
-			<name>GENERIC_STORAGE_SERVICE</name>
-			<type>2</type>
-			<locationURI>GENERIC_STORAGE_SERVICE</locationURI>
-		</link>
-		<link>
-			<name>MYDESK_COMMON</name>
-			<type>2</type>
-			<locationURI>MYDESK_COMMON</locationURI>
-		</link>
-		<link>
-			<name>PROTOCOL_BUFFER_UTILS</name>
-			<type>2</type>
-			<locationURI>PROTOCOL_BUFFER_UTILS</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

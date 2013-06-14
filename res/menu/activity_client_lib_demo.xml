@@ -19,19 +19,6 @@
     </menu>
   </item>
   
-  <item android:id="@+id/StorageSrvc" android:title="Storage Srvc">
-    <menu>
-      <item android:id="@+id/srvcLogin" android:title="Login" />
-      <item android:id="@+id/srvcCreate" android:title="Create Files" />
-      <item android:id="@+id/srvcSave" android:title="Save Files" />
-      <item android:id="@+id/srvcSync" android:title="Sync" />
-      
-      <!--<item android:id="@+id/srvcLoad" android:title="Load a File" />
-      <item android:id="@+id/srvcGetMeta" android:title="Get a Meta" /> -->
-      
-    </menu>  
-  </item>
-  
   <item android:id="@+id/exit" android:title="Exit"/>
   
 </menu>
