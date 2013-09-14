@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>
   
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="10"
         android:targetSdkVersion="17" />
 
     <application
@@ -38,25 +38,8 @@
         </activity>
         
         <activity android:name="edu.umich.imlc.mydesk.cloud.backend.android.LoginActivity" ></activity>
-        <!-- Generic Service -->
-        <!--
-        <provider
-            android:name="edu.umich.imlc.mydesk.test.provider.GenericProvider"
-            android:authorities="edu.umich.imlc.mydesk.test.service.provider" android:exported="true">
-        </provider>
+        <activity android:name="edu.umich.imlc.mydesk.cloud.android.auth.NewUserActivity" ></activity>
 
-        <activity
-            android:name="edu.umich.imlc.mydesk.test.auth.LoginActivty"
-            android:exported="true" android:screenOrientation="portrait">
-        </activity>
-        
-        <service android:name="GenericSyncService" android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
-            </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter" android:resource="@xml/sync_generic"/>
-        </service>
-        -->
     </application>
 
 </manifest>

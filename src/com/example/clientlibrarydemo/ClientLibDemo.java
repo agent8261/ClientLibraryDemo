@@ -1,6 +1,8 @@
 package com.example.clientlibrarydemo;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.example.clientlibrarydemo.networktask.CheckConnectionTask;
 import com.example.clientlibrarydemo.networktask.GetAccessTask;
@@ -15,12 +17,16 @@ import edu.umich.imlc.mydesk.cloud.android.auth.LoginCallback;
 import edu.umich.imlc.mydesk.cloud.android.auth.LoginUtilities;
 import edu.umich.imlc.mydesk.cloud.android.exceptions.AppNeedsUserPermission;
 import edu.umich.imlc.mydesk.cloud.client.utilities.Util;
+import edu.umich.imlc.mydesk.test.common.Utils;
 
 
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnDismissListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,7 +68,7 @@ public class ClientLibDemo extends Activity
     
     orginalPath = new File(getExternalFilesDir(null), fileName);
     overwritePath = new File(getExternalFilesDir(null), overwriteName);
-    storedPath = new File(getExternalFilesDir(null), storeName);    
+    storedPath = new File(getExternalFilesDir(null), storeName);
   }
 
   // ---------------------------------------------------------------------------
@@ -165,6 +171,7 @@ public class ClientLibDemo extends Activity
     {
       Log.i(TAG, "Logged Successful");
       textView.append(accountName);
+      buildThenShowDialog("Succuessfully Logged In");
     }
 
     @Override
@@ -177,6 +184,35 @@ public class ClientLibDemo extends Activity
         startActivity(err.getIntent());
       }
     }    
+  }
+  
+  // ---------------------------------------------------------------------------
+  
+  private void buildThenShowDialog(String message)
+  {
+    Utils.printMethodName(TAG);
+    final AlertDialog alert = new AlertDialog.Builder(this).create();
+    alert.setMessage(message);
+    alert.setCancelable(true);
+    alert.setOnDismissListener(new OnDismissListener()
+    {
+      @Override
+      public void onDismiss(DialogInterface dialog)
+      {
+        finish();
+      }
+    });
+    alert.show();
+    
+    final Timer t = new Timer();
+    t.schedule(new TimerTask()
+    {
+      public void run()
+      {
+        alert.dismiss();
+        t.cancel();
+      }
+    }, 2000);
   }
   
   // ---------------------------------------------------------------------------
